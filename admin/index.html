@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watts & Wires | Live Traffic Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: #ffffff; color: #0a0a0c; padding: 3rem 8%; min-height: 100vh; }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        h1 { font-size: 1.8rem; font-weight: 900; }
+        h1 span { color: #dc2626; }
+
+        .refresh-btn {
+            background: #0a0a0c;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .refresh-btn:hover { background: #dc2626; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            max-width: 1100px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 6px solid #0a0a0c;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #25d366; }
+
+        .card span {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .count-number {
+            font-size: 3.2rem;
+            font-weight: 900;
+            margin-top: 0.5rem;
+            color: #0a0a0c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Watts & Wires <span>Traffic Center</span></h1>
+        <button class="refresh-btn" onclick="fetchStats()">Refresh Counts</button>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <span>Total Page Visitors</span>
+            <div class="count-number" id="viewsCount">--</div>
+        </div>
+
+        <div class="card red">
+            <span>Direct Call Clicks</span>
+            <div class="count-number" id="callsCount">--</div>
+        </div>
+
+        <div class="card green">
+            <span>WhatsApp Clicks</span>
+            <div class="count-number" id="waCount">--</div>
+        </div>
+    </div>
+
+    <script>
+        const NAMESPACE = "watts-wires-electrical-za";
+
+        async function fetchMetric(key, elementId) {
+            try {
+                // Fetches current numbers without incrementing them
+                const res = await fetch(`https://abacus.jasoncameron.dev/get/${NAMESPACE}/${key}`);
+                const data = await res.json();
+                document.getElementById(elementId).innerText = data.value !== undefined ? data.value : 0;
+            } catch (err) {
+                document.getElementById(elementId).innerText = "0";
+            }
+        }
+
+        function fetchStats() {
+            document.getElementById('viewsCount').innerText = "...";
+            document.getElementById('callsCount').innerText = "...";
+            document.getElementById('waCount').innerText = "...";
+
+            fetchMetric("page_views", "viewsCount");
+            fetchMetric("call_clicks", "callsCount");
+            fetchMetric("wa_clicks", "waCount");
+        }
+
+        // Load numbers on page open
+        fetchStats();
+    </script>
+</body>
+</html>
